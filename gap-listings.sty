@@ -2,9 +2,53 @@
 %
 % See http://tex.stackexchange.com/questions/108118/
 %
+%\PassOptionsToPackage{dvipsnames,svgnames}{xcolor}
 \RequirePackage{xcolor}
 \RequirePackage{textcomp}
 \RequirePackage{listings}
+
+% style of GAP keywords
+\definecolor{GAPkeywords}{RGB}{077,145,021}
+\newcommand\GAPkeywordstyle{\color{GAPkeywords}}
+
+\definecolor{GAPcommands}{cmy}{1.0,0.5,0.0}
+\newcommand\GAPcommandstyle{\color{GAPcommands}}
+
+\definecolor{GAPprompt}{named}{blue}
+\definecolor{GAPbrk}{named}{red}
+
+
+%
+% Simple GAP code highlighting
+%
+\lstdefinelanguage{GAPsrc}
+{%
+  basicstyle =\ttfamily,
+  alsoletter=>,
+  morekeywords=[2]{%
+    and,break,continue,do,elif,else,end,fail,false,fi,for,function,if,in,%
+    local,mod,not,od,or,rec,repeat,return,then,true,until,while,
+    IsBound,Unbind,Assert,Info,
+  },%
+  keywordstyle=[2]\GAPkeywordstyle,%
+  morekeywords=[3]{%
+    Display,
+    PolynomialRing,
+    Print,
+    QuotientRemainder,
+    Rationals,
+    Read,
+  },%
+  keywordstyle=[3]\GAPcommandstyle,%
+  sensitive=true,%
+  upquote=true,% <--- for straight single quotes
+  showstringspaces=false,
+  columns=flexible,
+  morecomment=[l]\#,
+  morestring=[b]',
+  morestring=[b]",
+  basewidth={0.55em,0.45em},
+}%
 
 \makeatletter
 
@@ -13,36 +57,25 @@
 % switch to flag whether a prompt `keyword' is an bona fide GAP prompt
 \newif\iftoolateforprompt@GAP@
 
-% style of GAP keywords
-\definecolor{GAPkeywords}{RGB}{077,145,021}
-\newcommand\GAPkeywordstyle{\color{GAPkeywords}}
-
 % font shape of GAP input lines 
-\newcommand\GAPinputfshape\slshape
+\newcommand\GAPinputstyle{\color{black}}
 
-\lstdefinelanguage{GAPlog}
+\lstdefinelanguage{GAPlog}[]{GAPsrc}
 {%
-  basicstyle =\ttfamily,
-  alsoletter=>,
-  morekeywords=[2]{%
-    and,break,continue,do,elif,else,end,fail,false,fi,for,function,if,in,%
-    local,mod,not,od,or,rec,repeat,return,then,true,until,while,
-  },%
+  basicstyle =\ttfamily\color{gray},
   keywordstyle=[2]\Process@GAP@keywords,
-  morekeywords=[3]{gap>,>},
-  keywordstyle=[3]\Process@GAP@prompt{blue},
-  morekeywords=[4]{brk>},
-  keywordstyle=[4]\Process@GAP@prompt{red},
-  sensitive=true,%
-  upquote=true,% <--- for straight single quotes
-  showstringspaces=false,
-  morecomment=[l]\#,
-  morestring=[b]',
-  morestring=[b]",
+  keywordstyle=[3]\Process@GAP@commands,
+  morekeywords=[4]{gap>,>},
+  keywordstyle=[4]\Process@GAP@prompt{GAPprompt},
+  morekeywords=[5]{brk>},
+  keywordstyle=[5]\Process@GAP@prompt{GAPbrk},
+  %columns=flexible,
+  %columns=fullflexible,
 }%
 
-% only highlight keywords if a prompt has occured on the current line
+% only highlight keywords if a prompt has occurred on the current line
 \newcommand\Process@GAP@keywords{\ifprompt@GAP@\GAPkeywordstyle\fi}
+\newcommand\Process@GAP@commands{\ifprompt@GAP@\GAPcommandstyle\fi}
 
 \newcommand\Process@GAP@prompt[1]
 {%
@@ -50,7 +83,7 @@
   \else%
       \color{#1}\upshape% customise the style of your > and gap> prompts here
       \global\prompt@GAP@true%
-      \aftergroup\GAPinputfshape% we trigger slanted shape after > or gap>
+      \aftergroup\GAPinputstyle% we trigger slanted shape after > or gap>
   \fi%
 }
 
@@ -69,21 +102,3 @@
 \lst@AddToHook{PostOutput}{\global\toolateforprompt@GAP@true}
 
 \makeatother
-
-
-\lstdefinelanguage{GAPsrc}
-{%
-  basicstyle =\ttfamily,
-  alsoletter=>,
-  morekeywords=[2]{%
-    and,break,continue,do,elif,else,end,fail,false,fi,for,function,if,in,%
-    local,mod,not,od,or,rec,repeat,return,then,true,until,while,
-  },%
-  keywordstyle=\GAPkeywordstyle,%
-  sensitive=true,%
-  upquote=true,% <--- for straight single quotes
-  showstringspaces=false,
-  morecomment=[l]\#,
-  morestring=[b]',
-  morestring=[b]",
-}%
