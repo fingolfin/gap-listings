@@ -1,0 +1,33 @@
+\documentclass{article}
+
+\usepackage{gap-listings}
+
+\begin{document}
+
+\begin{lstlisting}[language=GAPsrc]
+Bahn := function(erz, a, wirk)
+  local delta, b, g, c;
+  delta := [a];
+  for b in delta do
+      for g in erz do
+          c := wirk(b, g);
+          if not c in delta then
+              Add(delta, c);
+          fi;
+      od;
+  od;
+  return delta;
+end;
+\end{lstlisting}
+
+\begin{lstlisting}[language=GAPlog]
+gap> Bahn([(1,2), (1,2,3)], 1, permWirk);
+[ 1, 2, 3 ]
+\end{lstlisting}
+
+
+
+
+
+
+\end{document}  

@@ -1,0 +1,89 @@
+% Highlight GAP code and GAP sessions.
+%
+% See http://tex.stackexchange.com/questions/108118/
+%
+\RequirePackage{xcolor}
+\RequirePackage{textcomp}
+\RequirePackage{listings}
+
+\makeatletter
+
+% switch to remember whether a prompt was found on the current line
+\newif\ifprompt@GAP@
+% switch to flag whether a prompt `keyword' is an bona fide GAP prompt
+\newif\iftoolateforprompt@GAP@
+
+% style of GAP keywords
+\definecolor{GAPkeywords}{RGB}{077,145,021}
+\newcommand\GAPkeywordstyle{\color{GAPkeywords}}
+
+% font shape of GAP input lines 
+\newcommand\GAPinputfshape\slshape
+
+\lstdefinelanguage{GAPlog}
+{%
+  basicstyle =\ttfamily,
+  alsoletter=>,
+  morekeywords=[2]{%
+    and,break,continue,do,elif,else,end,fail,false,fi,for,function,if,in,%
+    local,mod,not,od,or,rec,repeat,return,then,true,until,while,
+  },%
+  keywordstyle=[2]\Process@GAP@keywords,
+  morekeywords=[3]{gap>,>},
+  keywordstyle=[3]\Process@GAP@prompt{blue},
+  morekeywords=[4]{brk>},
+  keywordstyle=[4]\Process@GAP@prompt{red},
+  sensitive=true,%
+  upquote=true,% <--- for straight single quotes
+  showstringspaces=false,
+  morecomment=[l]\#,
+  morestring=[b]',
+  morestring=[b]",
+}%
+
+% only highlight keywords if a prompt has occured on the current line
+\newcommand\Process@GAP@keywords{\ifprompt@GAP@\GAPkeywordstyle\fi}
+
+\newcommand\Process@GAP@prompt[1]
+{%
+  \iftoolateforprompt@GAP@%
+  \else%
+      \color{#1}\upshape% customise the style of your > and gap> prompts here
+      \global\prompt@GAP@true%
+      \aftergroup\GAPinputfshape% we trigger slanted shape after > or gap>
+  \fi%
+}
+
+% Hook into InitVarsEOL (some hook executed right after an EOL) to:
+% - reset the \ifprompt@GAP@ and \iftoolateforprompt@GAP@ switches
+% - reset the font shape to \upshape
+\lst@AddToHook{InitVarsEOL}%
+{%
+  \global\prompt@GAP@false%
+  \global\toolateforprompt@GAP@false%
+  \upshape%
+}
+
+% Hook into PostOutput to signal that a GAP prompt
+% can no occur on the current line
+\lst@AddToHook{PostOutput}{\global\toolateforprompt@GAP@true}
+
+\makeatother
+
+
+\lstdefinelanguage{GAPsrc}
+{%
+  basicstyle =\ttfamily,
+  alsoletter=>,
+  morekeywords=[2]{%
+    and,break,continue,do,elif,else,end,fail,false,fi,for,function,if,in,%
+    local,mod,not,od,or,rec,repeat,return,then,true,until,while,
+  },%
+  keywordstyle=\GAPkeywordstyle,%
+  sensitive=true,%
+  upquote=true,% <--- for straight single quotes
+  showstringspaces=false,
+  morecomment=[l]\#,
+  morestring=[b]',
+  morestring=[b]",
+}%
